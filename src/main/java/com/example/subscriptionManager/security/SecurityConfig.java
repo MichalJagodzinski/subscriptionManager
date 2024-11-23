@@ -18,10 +18,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/register", "/api/users")) // Wyłączenie CSRF dla endpointów
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/users/register", "/api/users", "api/auth/login")) // Wyłączenie CSRF dla endpointów
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/register").permitAll() // Publiczny dostęp do rejestracji
                         .requestMatchers("/api/users").permitAll() // Publiczny dostęp do wyświetlania użytkowników
+                        .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne endpointy wymagają logowania
                 )
                 .httpBasic(basic -> basic.disable())
