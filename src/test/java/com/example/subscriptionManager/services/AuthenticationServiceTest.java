@@ -39,7 +39,6 @@ class AuthenticationServiceTest {
 
     @Test
     void authenticate_ShouldReturnToken_WhenCredentialsAreValid() {
-        // Arrange
         LoginRequestDTO loginRequest = new LoginRequestDTO("test@example.com", "password123");
         User user = new User();
         user.setId(1L);
@@ -51,10 +50,8 @@ class AuthenticationServiceTest {
         when(passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())).thenReturn(true);
         when(jwtTokenProvider.generateToken(user)).thenReturn("mockedToken");
 
-        // Act
         String token = authenticationService.authenticate(loginRequest);
 
-        // Assert
         assertEquals("mockedToken", token);
         verify(userRepository, times(1)).findByEmail(loginRequest.getEmail());
         verify(passwordEncoder, times(1)).matches(loginRequest.getPassword(), user.getPasswordHash());
@@ -63,12 +60,10 @@ class AuthenticationServiceTest {
 
     @Test
     void authenticate_ShouldThrowException_WhenEmailIsInvalid() {
-        // Arrange
         LoginRequestDTO loginRequest = new LoginRequestDTO("invalid@example.com", "password123");
 
         when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.empty());
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authenticationService.authenticate(loginRequest));
         assertEquals("invalid email address or password", exception.getMessage());
@@ -79,7 +74,6 @@ class AuthenticationServiceTest {
 
     @Test
     void authenticate_ShouldThrowException_WhenPasswordIsInvalid() {
-        // Arrange
         LoginRequestDTO loginRequest = new LoginRequestDTO("test@example.com", "wrongPassword");
         User user = new User();
         user.setId(1L);
@@ -90,7 +84,6 @@ class AuthenticationServiceTest {
         when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())).thenReturn(false);
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authenticationService.authenticate(loginRequest));
         assertEquals("invalid email address or password", exception.getMessage());

@@ -16,16 +16,13 @@ public class AuthControllerTest {
 
     @Test
     void login_ValidCredentials_ReturnsToken() {
-        // Arrange
         LoginRequestDTO loginRequest = new LoginRequestDTO("user@example.com", "password123");
         String expectedToken = "mocked-jwt-token";
 
         when(authenticationService.authenticate(loginRequest)).thenReturn(expectedToken);
 
-        // Act
         ResponseEntity<String> response = authController.login(loginRequest);
 
-        // Assert
         assertNotNull(response);
         assertEquals(200, response.getStatusCode().value());
         assertEquals(expectedToken, response.getBody());
@@ -36,7 +33,6 @@ public class AuthControllerTest {
         LoginRequestDTO loginRequest = new LoginRequestDTO("user@example.com", "wrong-password");
         when(authenticationService.authenticate(loginRequest)).thenThrow(new RuntimeException("Invalid credentials"));
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> authController.login(loginRequest));
         assertEquals("Invalid credentials", exception.getMessage());
     }
