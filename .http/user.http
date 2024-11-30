@@ -1,0 +1,13 @@
+### Register request
+POST http://localhost:8080/api/users/register
+Content-Type: application/json
+
+{
+  "username": "test11",
+  "email": "test11@test.com",
+  "password": "testtest10"
+}
+
+### Get all users request
+GET http://localhost:8080/api/users
+Content-Type: application/json

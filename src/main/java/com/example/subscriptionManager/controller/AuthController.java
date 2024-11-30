@@ -2,6 +2,7 @@ package com.example.subscriptionManager.controller;
 
 import com.example.subscriptionManager.dto.LoginRequestDTO;
 import com.example.subscriptionManager.service.AuthenticationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequest) {
-        String token = authenticationService.authenticate(loginRequest);
-        return ResponseEntity.ok(token);
+        try{
+            return authenticationService.authenticate(loginRequest);
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid email address or password");
+        }
     }
 }

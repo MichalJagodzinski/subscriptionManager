@@ -45,7 +45,7 @@ class UserControllerTest {
 
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenReturn(user);
 
-        ResponseEntity<User> response = userController.registerUser(registrationDTO);
+        ResponseEntity<?> response = userController.registerUser(registrationDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(user, response.getBody());

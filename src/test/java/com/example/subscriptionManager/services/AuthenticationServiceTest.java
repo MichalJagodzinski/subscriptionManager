@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -50,9 +52,10 @@ class AuthenticationServiceTest {
         when(passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())).thenReturn(true);
         when(jwtTokenProvider.generateToken(user)).thenReturn("mockedToken");
 
-        String token = authenticationService.authenticate(loginRequest);
+        ResponseEntity<String> response = authenticationService.authenticate(loginRequest);
 
-        assertEquals("mockedToken", token);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Login successful. Token: mockedToken", response.getBody());
         verify(userRepository, times(1)).findByEmail(loginRequest.getEmail());
         verify(passwordEncoder, times(1)).matches(loginRequest.getPassword(), user.getPasswordHash());
         verify(jwtTokenProvider, times(1)).generateToken(user);

@@ -4,6 +4,7 @@ import com.example.subscriptionManager.dto.LoginRequestDTO;
 import com.example.subscriptionManager.entity.User;
 import com.example.subscriptionManager.repository.UserRepository;
 import com.example.subscriptionManager.security.JwtTokenProvider;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +21,16 @@ public class AuthenticationService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public String authenticate(LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<String> authenticate(LoginRequestDTO loginRequestDTO) {
         User user = userRepository.findByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("invalid email address or password"));
 
-        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPasswordHash()))
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPasswordHash())) {
             throw new RuntimeException("invalid email address or password");
+        }
 
-        return jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user);
+
+        return ResponseEntity.ok("Login successful. Token: " + token);
     }
 }

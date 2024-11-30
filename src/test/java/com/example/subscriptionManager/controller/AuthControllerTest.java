@@ -3,9 +3,11 @@ package com.example.subscriptionManager.controller;
 import com.example.subscriptionManager.dto.LoginRequestDTO;
 import com.example.subscriptionManager.service.AuthenticationService;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,21 +21,25 @@ public class AuthControllerTest {
         LoginRequestDTO loginRequest = new LoginRequestDTO("user@example.com", "password123");
         String expectedToken = "mocked-jwt-token";
 
-        when(authenticationService.authenticate(loginRequest)).thenReturn(expectedToken);
+        when(authenticationService.authenticate(loginRequest)).thenReturn(ResponseEntity.ok(expectedToken));
 
         ResponseEntity<String> response = authController.login(loginRequest);
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expectedToken, response.getBody());
     }
 
     @Test
     void login_InvalidCredentials_ReturnsUnauthorized() {
         LoginRequestDTO loginRequest = new LoginRequestDTO("user@example.com", "wrong-password");
-        when(authenticationService.authenticate(loginRequest)).thenThrow(new RuntimeException("Invalid credentials"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> authController.login(loginRequest));
-        assertEquals("Invalid credentials", exception.getMessage());
+        when(authenticationService.authenticate(loginRequest)).thenReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
+
+        ResponseEntity<String> response = authController.login(loginRequest);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid credentials", response.getBody());
     }
 }

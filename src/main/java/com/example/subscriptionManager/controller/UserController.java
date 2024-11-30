@@ -3,6 +3,7 @@ package com.example.subscriptionManager.controller;
 import com.example.subscriptionManager.dto.UserRegistrationDTO;
 import com.example.subscriptionManager.entity.User;
 import com.example.subscriptionManager.service.UserService;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,19 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO) {
-        User registedUser = userService.registerUser(registrationDTO);
-        return new ResponseEntity<>(registedUser, HttpStatus.CREATED);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO) {
+        try {
+            User registeredUser = userService.registerUser(registrationDTO);
+            return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid registration data: " + ex.getMessage());
+        }
+    }
+
+    // Obsługa błędów walidacji
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<String> handleValidationException(ConstraintViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation error: " + ex.getMessage());
     }
 
     @GetMapping
